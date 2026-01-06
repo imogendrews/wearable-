@@ -1,13 +1,44 @@
-frontend/
-├─ index.html
-├─ visualization.js
-├─ supabaseClient.js
-├─ dataStore.js
-├─ viz/
-│ ├─ Scene.js
-│ ├─ ExperienceRing.js
-│ └─ PulseMapper.js
-└─ style.css
+**Before working on the frontend!**
+
+Quick setup
+
+1. Pull the repo and change into the frontend folder:
+
+```bash
+git pull
+cd src/frontend
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start the dev server (uses Vite):
+
+```bash
+npm run dev
+# open http://localhost:5173 (Vite default) or follow the terminal URL
+```
+
+Troubleshooting
+
+- If `npm run dev` fails, run `npm install` again and check Node version.
+- If Supabase realtime connections fail, check the anon key and table permissions (RLS / public read access) and browser console for CORS errors.
+
+# **Explanation of the files**
+
+**frontend/** <br>
+├─ index.html <br>
+├─ visualization.js <br>
+├─ supabaseClient.js <br>
+├─ dataStore.js <br>
+├─ viz/ <br>
+│ ├─ Scene.js <br>
+│ ├─ ExperienceRing.js <br>
+│ └─ PulseMapper.js <br>
+└─ style.css <br>
 
 ## `index.html`
 
