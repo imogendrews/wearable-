@@ -16,4 +16,4 @@
 # Mac / System files
 .DS_Store
 
-./src/frontend/node_modules
+src/frontend/node_modules/
