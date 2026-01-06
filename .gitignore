@@ -1,0 +1,17 @@
+# Supabase
+.branches
+.temp
+
+# dotenvx
+.env.keys
+.env.local
+.env.*.local
+
+.pio/
+.vscode/
+*.bin
+*.elf
+*.pioenvs/
+
+# Mac / System files
+.DS_Store
