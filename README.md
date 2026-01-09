@@ -60,11 +60,12 @@ To use the fake data you need to do the above steps (connect the ESP32, make sur
 
 - Do not commit `.pio` or `.vscode` folders.
 - Use `.gitignore` and make sure this is in it: 
-# Supabase
+
+``` Supabase:
 .branches
 .temp
 
-# dotenvx
+dotenvx:
 .env.keys
 .env.local
 .env.*.local
@@ -75,7 +76,7 @@ To use the fake data you need to do the above steps (connect the ESP32, make sur
 *.elf
 *.pioenvs/
 
-# Mac / System files
+ Mac / System files:
 .DS_Store
 
 src/frontend/node_modules/
