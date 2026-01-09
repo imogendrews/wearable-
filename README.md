@@ -25,7 +25,7 @@ This project uses an ESP32 with a pulse sensor to track visitors' heartbeats in 
 
 1. Make sure that you have the extension PlatformIO IDE installed and enabled
 2. Connect the pulse sensor:
-   - VIN → 5V
+   - 3V3 → 3V
    - GND → GND
    - Signal → GPIO34
 3. Update `ssid` and `password` in `main.cpp` for your Wi-Fi.
@@ -48,7 +48,35 @@ On line 48 add:
     timerAlarmWrite(sampleTimer, 2000, true);
     timerAlarmEnable(sampleTimer);
 
+6. Then first build your code by clicking the tick sign as shown in the below picture, you then upload it using the below arrow to the right and then you click the weird plug symbol to open the serial monitor
+
+![My photo](./pictures/platformio.png)
+
+## Using fake data
+
+To use the fake data you need to do the above steps (connect the ESP32, make sure supabase credentials are in there) but we aren't using PulseSensorPlayground so you can forget that. Something that you might have to do is make sure you are on the correct port. To do this click Command + Shift + P and search for 'PlatformIO - Set Project Port' and there select cu.usbserial.0001. You should now see this at the bottom of your screen
+
 ## Notes
 
 - Do not commit `.pio` or `.vscode` folders.
-- Use `.gitignore` to avoid large files.
+- Use `.gitignore` and make sure this is in it: 
+# Supabase
+.branches
+.temp
+
+# dotenvx
+.env.keys
+.env.local
+.env.*.local
+
+.pio/
+.vscode/
+*.bin
+*.elf
+*.pioenvs/
+
+# Mac / System files
+.DS_Store
+
+src/frontend/node_modules/
+
