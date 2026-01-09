@@ -36,17 +36,18 @@ NB: You will probably need to add the following code to the Pulse Sensor Playgro
 
 On line 48 add:
 
- bool PulseSensorPlayground::begin() (and delete other code) 
+ `bool PulseSensorPlayground::begin() (and delete other code)`
  
  and on line 493 replace the exisiting code with this: 
 
- // Use the Arduino-ESP32 timer API: timerBegin(timer_number, prescaler, countUp)
+ ```// Use the Arduino-ESP32 timer API: timerBegin(timer_number, prescaler, countUp)
     // With APB clock 80MHz, prescaler 80 yields a 1MHz tick (1us period).
     sampleTimer = timerBegin(0, 80, true); // timer 0, 1uS tick period
     timerAttachInterrupt(sampleTimer, &onInterrupt, true);
     // Set alarm for 2000 ticks = 2000us (2ms -> 500Hz) and enable it
     timerAlarmWrite(sampleTimer, 2000, true);
     timerAlarmEnable(sampleTimer);
+```
 
 6. Then first build your code by clicking the tick sign as shown in the below picture, you then upload it using the below arrow to the right and then you click the weird plug symbol to open the serial monitor
 
