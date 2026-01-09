@@ -32,37 +32,70 @@ This project uses an ESP32 with a pulse sensor to track visitors' heartbeats in 
 4. Update `SUPABASE_URL` and `SUPABASE_ANON_KEY` with your Supabase project details.
 5. Compile and upload via PlatformIO.
 
-NB: You will probably need to add the following code to the Pulse Sensor Playground file. You can find it in .pio -> libdeps/esp32dev -> PulseSensor Playground -> src -> PulseSensorPlayground.cpp. 
+### Quick PlatformIO tutorial
+
+1. Install PlatformIO (VS Code extension or CLI). For macOS CLI (recommended via `pipx`):
+
+```bash
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+# restart your terminal
+pipx install platformio
+```
+
+2. Confirm your ESP32 is connected and find its serial port:
+
+```bash
+ls /dev/cu.*
+# or
+platformio device list
+```
+
+3. From the project root, build the firmware:
+
+```bash
+platformio run -e esp32dev
+```
+
+4. Upload to the board (replace the env name or port if you changed it in `platformio.ini`):
+
+```bash
+platformio run -t upload -e esp32dev
+```
+
+5. Open the serial monitor to see device output (replace the port if different):
+
+```bash
+platformio device monitor -p /dev/cu.usbserial-0001 -b 115200
+```
+
+Press Ctrl+C to exit the monitor.
+
+GUI (VS Code) alternative: Use the PlatformIO toolbar (Build / Upload / Monitor) or Command Palette commands: `PlatformIO: Build`, `PlatformIO: Upload`, `PlatformIO: Serial Monitor`.
+
+NB: You will probably need to add the following code to the Pulse Sensor Playground file. You can find it in .pio -> libdeps/esp32dev -> PulseSensor Playground -> src -> PulseSensorPlayground.cpp.
 
 On line 48 add:
 
- `bool PulseSensorPlayground::begin() (and delete other code)`
- 
- and on line 493 replace the exisiting code with this: 
+`bool PulseSensorPlayground::begin() (and delete other code)`
 
- ```// Use the Arduino-ESP32 timer API: timerBegin(timer_number, prescaler, countUp)
-    // With APB clock 80MHz, prescaler 80 yields a 1MHz tick (1us period).
-    sampleTimer = timerBegin(0, 80, true); // timer 0, 1uS tick period
-    timerAttachInterrupt(sampleTimer, &onInterrupt, true);
-    // Set alarm for 2000 ticks = 2000us (2ms -> 500Hz) and enable it
-    timerAlarmWrite(sampleTimer, 2000, true);
-    timerAlarmEnable(sampleTimer);
+and on line 493 replace the exisiting code with this:
+
+```// Use the Arduino-ESP32 timer API: timerBegin(timer_number, prescaler, countUp)
+   // With APB clock 80MHz, prescaler 80 yields a 1MHz tick (1us period).
+   sampleTimer = timerBegin(0, 80, true); // timer 0, 1uS tick period
+   timerAttachInterrupt(sampleTimer, &onInterrupt, true);
+   // Set alarm for 2000 ticks = 2000us (2ms -> 500Hz) and enable it
+   timerAlarmWrite(sampleTimer, 2000, true);
+   timerAlarmEnable(sampleTimer);
 ```
-
-6. Then first build your code by clicking the tick sign as shown in the below picture, you then upload it using the below arrow to the right and then you click the weird plug symbol to open the serial monitor
-
-![My photo](./pictures/platformio.png)
-
-## Using fake data
-
-To use the fake data you need to do the above steps (connect the ESP32, make sure supabase credentials are in there) but we aren't using PulseSensorPlayground so you can forget that. Something that you might have to do is make sure you are on the correct port. To do this click Command + Shift + P and search for 'PlatformIO - Set Project Port' and there select cu.usbserial.0001. You should now see this at the bottom of your screen
 
 ## Notes
 
 - Do not commit `.pio` or `.vscode` folders.
-- Use `.gitignore` and make sure this is in it: 
+- Use `.gitignore` and make sure this is in it:
 
-``` Supabase:
+```Supabase:
 .branches
 .temp
 
@@ -82,3 +115,4 @@ dotenvx:
 
 src/frontend/node_modules/
 
+```
