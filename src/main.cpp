@@ -11,15 +11,91 @@ int fakeBPM = 72; // starting BPM (resting heart rate)
 // const char* ssid = "FRITZ!Box 6660 Cable IH";
 // const char* password = "35792990216402215870";
 // ===== WIFI CONFIG Sophie N =====
-const char *ssid = "FRITZ!Box 7530 WF";
-const char *password = "47091743728423894298";
+const char *ssid = "FRITZ!Box 6660 Cable IH";
+const char *password = "35792990216402215870";
 
 // ===== SUPABASE CONFIG =====
-const char *SUPABASE_URL = "https://xqzzmtsccrzyaajbhvbc.supabase.co/rest/v1/events";
+const char *SUPABASE_URL = "https://xqzzmtsccrzyaajbhvbc.supabase.co/rest/v1/pulse_data";
 const char *SUPABASE_ANON_KEY = "sb_publishable_fOFeRWtDQ661n7r3DaWfXw_pFyto0o-";
 // const char* SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co",
 // const char* SUPABASE_ANON_KEY =  "PUBLIC_ANON_KEY",
 const char *SESSION_ID = "test-session-456";
+
+// ===== FAKE NFC + TIME STATE + ARTWORK_ID=====
+int fakeTagCounter = 1;
+
+// start time: 12:37:15
+int fakeHour = 12;
+int fakeMinute = 37;
+int fakeSecond = 15;
+
+
+int artworkCounter = 1;
+int tagsInCurrentArtwork = 0;
+const int TAGS_PER_ARTWORK = 20;
+
+String sessionId = "session_001";  // 🔒 fixed for entire run
+
+
+String generateArtworkId()
+{
+  char buffer[20];
+  sprintf(buffer, "artwork_%03d", artworkCounter);
+  return String(buffer);
+}
+
+void advanceArtworkIfNeeded()
+{
+  tagsInCurrentArtwork++;
+
+  if (tagsInCurrentArtwork >= TAGS_PER_ARTWORK)
+  {
+    artworkCounter++;
+    tagsInCurrentArtwork = 0;
+
+    Serial.println("🔄 Switched to new artwork");
+  }
+}
+
+
+String formatTime(int h, int m, int s)
+{
+  char buffer[9];
+  sprintf(buffer, "%02d:%02d:%02d", h, m, s);
+  return String(buffer);
+}
+
+void advanceFakeTime(int secondsToAdd)
+{
+  fakeSecond += secondsToAdd;
+
+  if (fakeSecond >= 60)
+  {
+    fakeMinute += fakeSecond / 60;
+    fakeSecond = fakeSecond % 60;
+  }
+
+  if (fakeMinute >= 60)
+  {
+    fakeHour += fakeMinute / 60;
+    fakeMinute = fakeMinute % 60;
+  }
+
+  if (fakeHour >= 24)
+  {
+    fakeHour = fakeHour % 24;
+  }
+}
+
+String generateFakeTag()
+{
+  char buffer[16];
+  sprintf(buffer, "tag_%03d", fakeTagCounter);
+  fakeTagCounter++;
+  return String(buffer);
+}
+
+
 
 // ================== PULSE SENSOR CODE ==================
 // const int PulseWire = 34; // GPIO 34 (ADC)
@@ -32,6 +108,10 @@ void sendBPMToSupabase(int bpm)
 {
   if (WiFi.status() != WL_CONNECTED)
     return;
+  
+      String tag = generateFakeTag();
+  String timeString = formatTime(fakeHour, fakeMinute, fakeSecond);
+    String artworkId = generateArtworkId();
 
   HTTPClient http;
   http.begin(String(SUPABASE_URL));
@@ -41,11 +121,13 @@ void sendBPMToSupabase(int bpm)
   http.addHeader("Authorization", String("Bearer ") + SUPABASE_ANON_KEY);
 
   String body = String("{") +
-                "\"session_id\":\"" + SESSION_ID + "\"," +
-                "\"type\":\"pulse\"," +
-                "\"artwork_id\":\"painting_3\"," +
-                "\"value\":{ \"bpm\":" + String(bpm) + " }" +
-                "}";
+    "\"tag\":\"" + tag + "\"," +
+    "\"session_id\":\"" + sessionId + "\"," +   // 🔒 constant
+    "\"time\":\"" + timeString + "\"," +
+    "\"artwork_id\":\"" + artworkId + "\"," +   // 🔁 rotating
+    "\"bpm\":" + String(bpm) +
+  "}";
+
 
   int code = http.POST(body);
   Serial.print("Supabase response: ");
@@ -53,6 +135,10 @@ void sendBPMToSupabase(int bpm)
 
   Serial.println(http.getString());
   http.end();
+
+   // FAKE DATA: advance simulation
+  advanceFakeTime(20);
+  advanceArtworkIfNeeded();
 }
 
 // ================== FAKE BPM ==================
@@ -100,18 +186,20 @@ void setup()
 
 void loop()
 {
-  if (millis() - lastSend > 20000)
-  { // every 20 seconds
-    int bpm = generateFakeBPM();
+  unsigned long now = millis();
 
+  if (now - lastSend >= 20000)
+  {
+    lastSend = now;
+
+    int bpm = generateFakeBPM();
     Serial.print("FAKE BPM: ");
     Serial.println(bpm);
 
     sendBPMToSupabase(bpm);
-    lastSend = millis();
   }
 
-  delay(100);
+  delay(50);
 }
 
 // ================== PULSE SENSOR CODE ==================
